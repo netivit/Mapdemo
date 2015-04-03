@@ -114,6 +114,12 @@ public class MapDemoActivity extends FragmentActivity implements
                 for(i = 0 ; i < tl ; i++){
                     tt = sysArr.getString(i);
                     JSONObject ti = new JSONObject(tt);
+                   Double Lgi  = ti.getDouble("Lgi");
+                   Double Lat = ti.getDouble("Lat");
+                   int hour = ti.getInt("hour");
+                   int min = ti.getInt("min");
+
+
 
 
                 }
@@ -333,7 +339,7 @@ public class MapDemoActivity extends FragmentActivity implements
                 HttpGet httpGet = new HttpGet(urls[0]);
                 HttpClient client = new DefaultHttpClient();
 
-                HttpResponse response = client.execute(httpGet);
+                client.execute(httpGet);
 
 
             } catch (ClientProtocolException e) {
