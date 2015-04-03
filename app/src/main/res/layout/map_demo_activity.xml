@@ -39,4 +39,14 @@
         android:gravity="fill_vertical"
         android:onClick="Add" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load"
+        android:id="@+id/but2"
+        android:layout_above="@+id/map"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="Load" />
+
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.content.IntentSender;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -25,7 +26,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.http.HttpResponse;
@@ -77,6 +80,7 @@ public class MapDemoActivity extends FragmentActivity implements
                     loadMap(map);
                 }
             });
+
         } else {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -97,40 +101,6 @@ public class MapDemoActivity extends FragmentActivity implements
                     .addOnConnectionFailedListener(this).build();
 
             connectClient();
-            String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/find/test0";
-            try {
-                URL url = new URL(mUrl);
-                Scanner sc = new Scanner(url.openStream());
-                StringBuffer buf = new StringBuffer();
-                while(sc.hasNext()){
-                    buf.append(sc.next());
-                }
-                JSONObject jsonObject = new JSONObject(buf.toString());
-                JSONArray sysArr = jsonObject.getJSONArray("data");
-                int tl = sysArr.length();
-                int i;
-                String tt;
-                ArrayList<String> StorageA = new ArrayList<String>();
-                for(i = 0 ; i < tl ; i++){
-                    tt = sysArr.getString(i);
-                    JSONObject ti = new JSONObject(tt);
-                   Double Lgi  = ti.getDouble("Lgi");
-                   Double Lat = ti.getDouble("Lat");
-                   int hour = ti.getInt("hour");
-                   int min = ti.getInt("min");
-
-
-
-
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-
-            }
 
         } else {
             Toast.makeText(this, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
@@ -321,7 +291,7 @@ public class MapDemoActivity extends FragmentActivity implements
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int min = c.get(Calendar.MINUTE);
         String date = c.get(Calendar.DAY_OF_MONTH) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR);
-        String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test5?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
+        String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test6?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
         new SimpleTask().execute(mUrl.toString().trim());
         map.addMarker(new MarkerOptions()
         .position(new LatLng(Lat,Lgi))
@@ -348,6 +318,59 @@ public class MapDemoActivity extends FragmentActivity implements
 
             }
             return result;
+        }
+    }
+    public void Load(View v){
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/find/test6";
+        try {
+            URL url = new URL(mUrl);
+            Scanner sc = new Scanner(url.openStream());
+            StringBuffer buf = new StringBuffer();
+            while(sc.hasNext()){
+                buf.append(sc.next());
+            }
+            JSONObject jsonObject = new JSONObject(buf.toString());
+            JSONArray sysArr = jsonObject.getJSONArray("data");
+            int tl = sysArr.length();
+            int i;
+            String tt;
+            for(i = 0 ; i < tl ; i++){
+                tt = sysArr.getString(i);
+                JSONObject ti = new JSONObject(tt);
+                Double Lgi  = ti.getDouble("Lgi");
+                Double Lat = ti.getDouble("Lat");
+                int hour = ti.getInt("hour");
+                int min = ti.getInt("min");
+                String date = ti.getString("date");
+                String Temp[] = date.split("/");
+                boolean ComY = (Integer.parseInt(Temp[2]) == c.get(Calendar.YEAR));
+                boolean ComM = (Integer.parseInt(Temp[1]) == (c.get(Calendar.MONTH)+1));
+                boolean ComD0 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH));
+                boolean ComD1 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH)-1);
+                boolean ComH = hour < c.get(Calendar.HOUR_OF_DAY);
+                Log.v("Com",ComY + " : " + ComM + " : " + ComD0 + " : "+ComD1+ " : " + ComH );
+                if((ComY && ComM ) && (ComD0 || (ComD1 && ComH))) {
+                    Marker mark = map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(Lat, Lgi))
+                                    .title("บริเวณจุดจอดรถที่ว่าง")
+                                    .snippet("ณ เวลา " + hour + ":" + min + " วันที่ " + date)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    );
+                    mark.showInfoWindow();
+                }
+
+
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+
         }
     }
 
