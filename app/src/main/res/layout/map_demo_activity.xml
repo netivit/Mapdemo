@@ -42,7 +42,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Load"
+        android:text="Show"
         android:id="@+id/but2"
         android:layout_above="@+id/map"
         android:layout_alignParentLeft="true"

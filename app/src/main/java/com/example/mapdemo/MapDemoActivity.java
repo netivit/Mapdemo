@@ -351,7 +351,6 @@ public class MapDemoActivity extends FragmentActivity implements
                 boolean ComD0 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH));
                 boolean ComD1 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH)-1);
                 boolean ComH = hour < c.get(Calendar.HOUR_OF_DAY);
-                Log.v("Com",ComY + " : " + ComM + " : " + ComD0 + " : "+ComD1+ " : " + ComH );
                 if((ComY && ComM ) && (ComD0 || (ComD1 && ComH))) {
                     Marker mark = map.addMarker(new MarkerOptions()
                                     .position(new LatLng(Lat, Lgi))
