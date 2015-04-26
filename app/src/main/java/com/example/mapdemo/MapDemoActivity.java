@@ -56,7 +56,6 @@ public class MapDemoActivity extends FragmentActivity implements
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
     Calendar c = Calendar.getInstance();
-    Button A;
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -84,7 +83,7 @@ public class MapDemoActivity extends FragmentActivity implements
                     int hour = c.get(Calendar.HOUR_OF_DAY);
                     int min = c.get(Calendar.MINUTE);
                     String date = c.get(Calendar.DAY_OF_MONTH) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR);
-                    String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test0?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
+                    String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test6?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
                     new SimpleTask().execute(mUrl.trim());
                     map.addMarker(new MarkerOptions()
                                     .position(new LatLng(Lat, Lgi))
