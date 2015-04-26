@@ -12,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -52,10 +53,10 @@ public class MapDemoActivity extends FragmentActivity implements
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
     Calendar c = Calendar.getInstance();
+    Button A;
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -66,12 +67,32 @@ public class MapDemoActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_demo_activity);
+        Button A = (Button)findViewById(R.id.button);
         mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap map) {
                     loadMap(map);
+                }
+            });
+            A.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Double Lat = location.getLatitude();
+                    Double Lgi = location.getLongitude();
+                    int hour = c.get(Calendar.HOUR_OF_DAY);
+                    int min = c.get(Calendar.MINUTE);
+                    String date = c.get(Calendar.DAY_OF_MONTH) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR);
+                    String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test0?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
+                    new SimpleTask().execute(mUrl.trim());
+                    map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(Lat, Lgi))
+                                    .title("บันทึกบริเวณจุดจอดรถที่ว่าง")
+                                    .snippet("ณ เวลา " + hour + ":" + min + " วันที่ " + date)
+                    );
+                    Button A = (Button)findViewById(R.id.button);
+                    A.setVisibility(View.INVISIBLE);
                 }
             });
 
@@ -196,7 +217,7 @@ public class MapDemoActivity extends FragmentActivity implements
     }
 
     protected void startLocationUpdates() {
-        mLocationRequest = new LocationRequest();
+        LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
@@ -278,21 +299,6 @@ public class MapDemoActivity extends FragmentActivity implements
             return mDialog;
         }
     }
-    public void Add (View v){
-
-        Double Lat = location.getLatitude();
-        Double Lgi = location.getLongitude();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int min = c.get(Calendar.MINUTE);
-        String date = c.get(Calendar.DAY_OF_MONTH) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR);
-        String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test6?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
-        new SimpleTask().execute(mUrl.toString().trim());
-        map.addMarker(new MarkerOptions()
-        .position(new LatLng(Lat,Lgi))
-        .title("บันทึกบริเวณจุดจอดรถที่ว่าง")
-        .snippet("ณ เวลา " + hour +":"+min+" วันที่ " + date)
-        );
-    }
     private class SimpleTask extends AsyncTask<String, Void, String> {
 
 
@@ -345,12 +351,14 @@ public class MapDemoActivity extends FragmentActivity implements
                 boolean ComD0 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH));
                 boolean ComD1 = (Integer.parseInt(Temp[0]) == c.get(Calendar.DAY_OF_MONTH)-1);
                 boolean ComH = hour < c.get(Calendar.HOUR_OF_DAY);
+
                 if((ComY && ComM ) && (ComD0 || (ComD1 && ComH))) {
                     Marker mark = map.addMarker(new MarkerOptions()
                                     .position(new LatLng(Lat, Lgi))
                                     .title("บริเวณจุดจอดรถที่ว่าง")
                                     .snippet("ณ เวลา " + hour + ":" + min + " วันที่ " + date)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+
                     );
                     mark.showInfoWindow();
                 }

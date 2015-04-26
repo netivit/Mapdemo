@@ -37,6 +37,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:gravity="fill_vertical"
+        android:enabled="true"
         android:onClick="Add" />
 
     <Button
