@@ -78,6 +78,7 @@ public class MapDemoActivity extends FragmentActivity implements
             A.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     Double Lat = location.getLatitude();
                     Double Lgi = location.getLongitude();
                     int hour = c.get(Calendar.HOUR_OF_DAY);
