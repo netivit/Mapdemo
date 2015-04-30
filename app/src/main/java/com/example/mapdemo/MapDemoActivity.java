@@ -1,7 +1,9 @@
 package com.example.mapdemo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -49,13 +51,14 @@ public class MapDemoActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
-    private Location location;
+    private Location location
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
     Calendar c = Calendar.getInstance();
+    AlertDialog.Builder Con;
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -67,6 +70,7 @@ public class MapDemoActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_demo_activity);
         Button A = (Button)findViewById(R.id.button);
+
         mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -75,24 +79,35 @@ public class MapDemoActivity extends FragmentActivity implements
                     loadMap(map);
                 }
             });
+
             A.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    Double Lat = location.getLatitude();
-                    Double Lgi = location.getLongitude();
-                    int hour = c.get(Calendar.HOUR_OF_DAY);
-                    int min = c.get(Calendar.MINUTE);
-                    String date = c.get(Calendar.DAY_OF_MONTH) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR);
-                    String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test6?Lat="+ Lat+"&Lgi="+Lgi+"&hour=" + hour +"&min="+min+"&date="+date;
-                    new SimpleTask().execute(mUrl.trim());
-                    map.addMarker(new MarkerOptions()
-                                    .position(new LatLng(Lat, Lgi))
-                                    .title("บันทึกบริเวณจุดจอดรถที่ว่าง")
-                                    .snippet("ณ เวลา " + hour + ":" + min + " วันที่ " + date)
-                    );
-                    Button A = (Button)findViewById(R.id.button);
-                    A.setVisibility(View.INVISIBLE);
+                    Con = new AlertDialog.Builder(MapDemoActivity.this);
+                    Con.setTitle("ยืนยันการเพิ่มข้อมูล");
+                    Con.setMessage("เพิ่มสถานที่จอดรถเพียง 1 ครั้ง");
+                    Con.setNegativeButton("ยกเลิก", null);
+                    Con.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                            Double Lat = location.getLatitude();
+                            Double Lgi = location.getLongitude();
+                            int hour = c.get(Calendar.HOUR_OF_DAY);
+                            int min = c.get(Calendar.MINUTE);
+                            String date = c.get(Calendar.DAY_OF_MONTH) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.YEAR);
+                            String mUrl = "http://www.fbcredibility.com/cloudobject/usg01/insert/test6?Lat=" + Lat + "&Lgi=" + Lgi + "&hour=" + hour + "&min=" + min + "&date=" + date;
+                            new SimpleTask().execute(mUrl.trim());
+                            map.addMarker(new MarkerOptions()
+                                            .position(new LatLng(Lat, Lgi))
+                                            .title("บันทึกบริเวณจุดจอดรถที่ว่าง")
+                                            .snippet("ณ เวลา " + hour + ":" + min + " วันที่ " + date)
+                            );
+                            Button A = (Button) findViewById(R.id.button);
+                            A.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    Con.show();
                 }
             });
 
@@ -337,6 +352,7 @@ public class MapDemoActivity extends FragmentActivity implements
             int tl = sysArr.length();
             int i;
             String tt;
+            boolean check = true;
             for(i = 0 ; i < tl ; i++){
                 tt = sysArr.getString(i);
                 JSONObject ti = new JSONObject(tt);
@@ -361,10 +377,12 @@ public class MapDemoActivity extends FragmentActivity implements
 
                     );
                     mark.showInfoWindow();
+                    check = false;
                 }
-
-
             }
+                if(check){
+                    Toast.makeText(this,"ไม่มีการ ShareParking",Toast.LENGTH_LONG).show();
+                }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
